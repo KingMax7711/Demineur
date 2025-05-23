@@ -2,6 +2,7 @@
 from tkinter import *
 import random
 import time
+from PIL import Image, ImageTk
 
 class Grille:
     def __init__(self, can, longueurX, largeurY, nbCase):
@@ -16,7 +17,9 @@ class Grille:
         self.listeDrapeau = []
         self.listeMinesTrouver = []
         self.visiter = []
-
+        self.img_bombArmed = ImageTk.PhotoImage(Image.open("image/bombArmed.png").resize((int(self.caseX), int(self.caseY))))
+        self.img_bombDisarmed = ImageTk.PhotoImage(Image.open("image/bombDisarmed.png").resize((int(self.caseX), int(self.caseY))))
+        self.img_flag = ImageTk.PhotoImage(Image.open("image/flag.png").resize((int(self.caseX), int(self.caseY))))
 
     def initialiserGrille(self):
         self.can.delete("all")
@@ -43,9 +46,13 @@ class Grille:
         for (x, y) in self.listeMines:
             x1 = self.padding + x * self.caseX
             y1 = self.padding + y * self.caseY
-            x2 = x1 + self.caseX
-            y2 = y1 + self.caseY
-            self.can.create_oval(x1, y1, x2, y2, fill=self.verifCouleurMine(x, y), outline="black", tags=f"mine_{x}_{y}")
+            # Choix de l'image selon si la mine est trouvée ou non
+            if (x, y) in self.listeMinesTrouver:
+                img = self.img_bombDisarmed
+            else:
+                img = self.img_bombArmed
+            # Affichage de l'image (ancre NW = coin supérieur gauche)
+            self.can.create_image(x1, y1, image=img, anchor=NW, tags=f"mine_{x}_{y}")
             self.can.update()  # Met à jour l'affichage du canvas
             time.sleep(0.1)  # Pause pour voir les mines apparaître une par une
 
@@ -60,7 +67,9 @@ class Grille:
         case = self.getCase(x, y)
         if case:
             if (x, y) not in self.listeDrapeau and len(self.listeDrapeau) < len(self.listeMines):
-                self.can.create_oval(self.can.coords(case), fill="yellow", outline="black", tags=f"drapeau_{x}_{y}")
+                # self.can.create_oval(self.can.coords(case), fill="yellow", outline="black", tags=f"drapeau_{x}_{y}")
+                # Afficher l'image du drapeau
+                self.can.create_image(self.can.coords(case)[0] + self.caseX / 2, self.can.coords(case)[1] + self.caseY / 2, image=self.img_flag, anchor=CENTER, tags=f"drapeau_{x}_{y}")
                 self.listeDrapeau.append((x, y))
                 # Vérifier si le drapeau est sur une mine
                 if (x, y) in self.listeMines:
@@ -79,7 +88,14 @@ class Grille:
             for j in range(self.nbCase):
                 case = self.getCase(i, j)
                 if case:
-                    self.can.itemconfig(case, fill="")
+                    if self.can.itemcget(case, "fill") != "":
+                        # Animation de disparition progressive de la case
+                        for alpha in range(10, -1, -1):
+                            couleur = f"#00{hex(16*alpha)[2:]:>02}00"  # Du vert vers noir
+                            self.can.itemconfig(case, fill=couleur)
+                            self.can.update()
+                            time.sleep(0.0001)
+                        self.can.itemconfig(case, fill="")
 
                 text = self.can.find_withtag(f"nombre_{i}_{j}")
                 if text:

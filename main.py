@@ -313,6 +313,7 @@ def main(longueurX, largeurY, nbMines, nbCase, user, connected):
                 can.unbind("<Button-3>")
                 root.unbind("<space>")
                 grille.endGame(False)
+                infoLabel.config(text="Partie terminée, appuyez sur R pour recommencer ou Échap pour quitter", foreground="purple")
                 print("Défaite")
             else:
                 grille.propagation(x, y)
@@ -354,6 +355,9 @@ def main(longueurX, largeurY, nbMines, nbCase, user, connected):
         nonlocal NBCLICK
         nonlocal STARTTIME
 
+        if NBCLICK == 0:
+            return
+        
         endTime = time.time()
         elapsedTime = round(endTime - STARTTIME, 2)
 
@@ -395,5 +399,5 @@ def main(longueurX, largeurY, nbMines, nbCase, user, connected):
 
     root.mainloop()
 
+print("Ceci est le projet de Maxime Czegledi, TG1(2024-2025)")
 param()
-# main(600, 600, 10, 15, "Anonyme", False) #? DEBUG

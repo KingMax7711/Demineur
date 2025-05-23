@@ -22,5 +22,11 @@
                 "competitive": true
             }
         }
+    },
+    "Turing": {
+        "username": "Turing",
+        "password": "a0c87b3a9a3f13c4dc2ce2abde4d7dd4a5fb2fd26af757ccfe22cf5ce4840ecf",
+        "highscore": 999999,
+        "history": {}
     }
 }
